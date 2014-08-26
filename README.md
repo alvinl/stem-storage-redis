@@ -1,5 +1,5 @@
 # Redis storage
-This plugin extends Stem's storage to persist it into Redis. Storage is saved as a key in the format of `stem:$botUsername`
+This plugin extends Stem's storage to persist it into Redis. Storage data is saved as a key in the format of `stem:$botUsername`
 
 ## Installation
 1. `$ npm install git://github.com:alvinl/stem-storage-redis.git`
