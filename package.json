@@ -1,0 +1,15 @@
+{
+  "name": "stem-storage-redis",
+  "version": "1.0.0",
+  "description": "Persistent storage for Stem with a Redis backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alvin Lazaro <me@alvinl.com>",
+  "license": "MIT",
+  "dependencies": {
+    "hiredis": "^0.1.17",
+    "redis": "^0.12.1"
+  }
+}
