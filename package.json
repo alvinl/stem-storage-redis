@@ -1,6 +1,6 @@
 {
   "name": "stem-storage-redis",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Persistent storage for Stem with a Redis backend",
   "main": "index.js",
   "scripts": {
