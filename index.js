@@ -14,16 +14,40 @@ module.exports = function (Stem) {
       if (err)
         return Stem.log.error('Error fetching storage data from Redis:', err.message);
 
+      var parsedData;
+
+      try {
+
+        parsedData = JSON.parse(data);
+
+      } catch (err) {
+
+        return Stem.log.error('Failed to parse data.', err.message);
+
+      }
+
       // If previous storage was found, parse it and initialize it
       if (data)
-        Stem.storage._data = JSON.parse(data);
+        Stem.storage.load(parsedData);
 
     });
 
     // Save new data to redis
-    Stem.on('save', function (data) {
+    Stem.storage.on('change', function (data) {
 
-      redis.set('stem:' + Stem.config.username, JSON.stringify(data), function (err) {
+      var encodedData;
+
+      try {
+
+        encodedData = JSON.stringify(data);
+
+      } catch (err) {
+
+        return Stem.log.error('Error encoding data.', err.message);
+
+      }
+
+      redis.set('stem:' + Stem.config.username, encodedData, function (err) {
 
         if (err)
           return Stem.log.error('Error saving storage data:', err.message);
