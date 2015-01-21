@@ -1,39 +1,39 @@
 
-module.exports = function (Stem) {
+module.exports = function (stem) {
 
-  var port  = Stem.config.redisPort || 6379,
-      host  = Stem.config.redisHost || 'localhost',
-      redis = require('redis').createClient(port, host);
+  var port  = stem.config.redisPort || 6379,
+      pass  = stem.config.redisPass || null,
+      host  = stem.config.redisHost || 'localhost',
+      redis = require('redis').createClient(port, host, { auth_pass: pass });
 
-  // Wait until Redis is ready to start taking commands
-  redis.on('ready', function () {
+  redis.get('stem:storage:' + stem.config.username, function (err, storageData) {
 
-    // Fetch previous storage
-    redis.get('stem:' + Stem.config.username, function (err, data) {
+    if (err)
+      return stem.log.error('Error fetching storage data from Redis.', err.message);
 
-      if (err)
-        return Stem.log.error('Error fetching storage data from Redis:', err.message);
+    // No storage data found
+    else if (!storageData)
+      return stem.storage.load({});
 
-      var parsedData;
+    // Parse and load storage data
+    try {
 
-      try {
+      /**
+       * Json parsed data from Redis
+       * @type {Object}
+       */
+      var parsedStorageData = JSON.parse(storageData);
 
-        parsedData = JSON.parse(data);
+      stem.storage.load(parsedStorageData);
 
-      } catch (err) {
+    } catch (err) {
 
-        return Stem.log.error('Failed to parse data.', err.message);
+      return stem.log.error('Failed to parse storage data from Redis.', err.message);
 
-      }
+    }
 
-      // If previous storage was found, parse it and initialize it
-      if (data)
-        Stem.storage.load(parsedData);
-
-    });
-
-    // Save new data to redis
-    Stem.storage.on('change', function (data) {
+    // Save changes to Redis
+    stem.storage.on('change', function (data) {
 
       var encodedData;
 
@@ -43,14 +43,14 @@ module.exports = function (Stem) {
 
       } catch (err) {
 
-        return Stem.log.error('Error encoding data.', err.message);
+        return stem.log.error('Error encoding data.', err.message);
 
       }
 
-      redis.set('stem:' + Stem.config.username, encodedData, function (err) {
+      redis.set('stem:storage:' + stem.config.username, encodedData, function (err) {
 
         if (err)
-          return Stem.log.error('Error saving storage data:', err.message);
+          return stem.log.error('Error saving storage data.', err.message);
 
       });
 
