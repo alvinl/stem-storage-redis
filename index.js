@@ -32,27 +32,27 @@ module.exports = function (stem) {
 
     }
 
-    // Save changes to Redis
-    stem.storage.on('change', function (data) {
+  });
 
-      var encodedData;
+  // Save changes to Redis
+  stem.storage.on('change', function (data) {
 
-      try {
+    var encodedData;
 
-        encodedData = JSON.stringify(data);
+    try {
 
-      } catch (err) {
+      encodedData = JSON.stringify(data);
 
-        return stem.log.error('Error encoding data.', err.message);
+    } catch (err) {
 
-      }
+      return stem.log.error('Error encoding data.', err.message);
 
-      redis.set('stem:storage:' + stem.config.username, encodedData, function (err) {
+    }
 
-        if (err)
-          return stem.log.error('Error saving storage data.', err.message);
+    redis.set('stem:storage:' + stem.config.username, encodedData, function (err) {
 
-      });
+      if (err)
+        return stem.log.error('Error saving storage data.', err.message);
 
     });
 
